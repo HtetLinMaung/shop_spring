@@ -1,5 +1,9 @@
 package com.example.shop.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +15,9 @@ import com.example.shop.models.Product;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository("productDao")
@@ -25,8 +32,21 @@ public class ProductDataAccessService implements ProductDao {
     @Override
     public int insertProduct(Product product) {
         final var sql = "INSERT INTO product (name, description, price, discount_percent, image_url) VALUES (?, ?, ?, ?, ?)";
-        return jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getPrice(),
-                product.getDiscount_percent(), product.getImage_url());
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, product.getName());
+                ps.setString(2, product.getDescription());
+                ps.setDouble(3, product.getPrice());
+                ps.setDouble(4, product.getDiscount_percent());
+                ps.setString(5, product.getImage_url());
+                return ps;
+            }
+        }, keyHolder);
+         Long id = (Long) keyHolder.getKeys().get("id");
+         return id.intValue();
     }
 
     @Override

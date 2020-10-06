@@ -2,7 +2,7 @@ package com.example.shop.models;
 
 import java.util.List;
 
-public class ProductAddRequest {
+public class ProductRequest {
     private final String name;
     private final String description;
     private final double price;
@@ -10,7 +10,7 @@ public class ProductAddRequest {
     private final String image_url;
     private final List<Integer> categories;
 
-    public ProductAddRequest(String name, String description, double price, double discount_price, String image_url, List<Integer> categories) {
+    public ProductRequest(String name, String description, double price, double discount_price, String image_url, List<Integer> categories) {
         this.name = name;
         this.description = description;
         this.price = price;
